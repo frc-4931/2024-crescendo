@@ -6,14 +6,6 @@ package frc.robot;
 
 import edu.wpi.first.wpilibj.RobotBase;
 
-<<<<<<< HEAD
-public final class Main {
-  private Main() {}
-
-  public static void main(String... args) {
-    RobotBase.startRobot(Robot::new);
-  }
-=======
 /**
  * Do NOT add any static variables to this class, or any initialization at all.
  * Unless you know what
@@ -34,5 +26,5 @@ public final class Main {
     public static void main(String... args) {
         RobotBase.startRobot(Robot::new);
     }
->>>>>>> 2cb198a (This is the code I was working on with path planner.)
 }
+
