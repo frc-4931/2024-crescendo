@@ -19,10 +19,15 @@ import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation3d;
+import edu.wpi.first.networktables.NetworkTable;
+import edu.wpi.first.networktables.NetworkTableEntry;
+import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class Vision {
     AprilTagFieldLayout aprilTagFieldLayout;
     PhotonCamera camera = new PhotonCamera("photonvision");
+
     Transform3d robotToCam = new Transform3d(new Translation3d(-0.305, .3302, 0.305), new Rotation3d(0,0,45));
     PhotonPoseEstimator photonPoseEstimator; 
      private final ArrayList<double[]> poses = new ArrayList<>();
@@ -61,5 +66,22 @@ public class Vision {
     public double[] getLatestPose3d() {
         return poses.size() == 0 ? new double[7] : poses.remove(0);
     }
-}
 
+    public double getNoteDistance(){
+        NetworkTable table = NetworkTableInstance.getDefault().getTable("limelight");
+        NetworkTableEntry ty = table.getEntry("ty");
+        double targetOffsetAngle_Vertical = ty.getDouble(0.0);
+
+        double limelightMountAngleDegrees = 67.2; 
+
+        double limelightLensHeightM = 0.41; 
+
+        double angleToGoalDegrees = limelightMountAngleDegrees + targetOffsetAngle_Vertical;
+        double angleToGoalRadians = angleToGoalDegrees * (3.14159 / 180.0);
+
+        double distanceFromLimelightToGoalM =  Math.tan(angleToGoalRadians) * (limelightLensHeightM);
+        System.out.println(distanceFromLimelightToGoalM);
+
+        return distanceFromLimelightToGoalM;
+    }
+}

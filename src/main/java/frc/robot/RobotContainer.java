@@ -36,6 +36,7 @@ import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.PrintCommand;
 import edu.wpi.first.wpilibj2.command.RamseteCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.SwerveControllerCommand;
@@ -51,11 +52,13 @@ import frc.robot.subsystems.PoseEstimator;
 import frc.robot.subsystems.SwerveSubsystem;
 import frc.robot.subsystems.Vision;
 
+
+
 public class RobotContainer {
     private final Vision vision = new Vision();
     private final SwerveSubsystem swerveSubsystem = new SwerveSubsystem(vision);
     private final PoseEstimator poseEstimator = new PoseEstimator(swerveSubsystem, vision, new Pose2d(2, 7, swerveSubsystem.getRotation2d()));
-    private AutoCommand autoComands = new AutoCommand();
+    private AutoCommand autoComands = new AutoCommand(vision, swerveSubsystem);
     private final CommandXboxController driverJoytick = new CommandXboxController(OIConstants.kDriverControllerPort);
     private final Joystick buttonBox = new Joystick(1);
 
@@ -70,6 +73,8 @@ public class RobotContainer {
                 () -> -driverJoytick.getRawAxis(OIConstants.kDriverRotAxis),
                 () -> !driverJoytick.b().getAsBoolean()));
 
+        NamedCommands.registerCommand("PathPlan", autoComands.toNote());
+
 
         configureButtonBindings();
 
@@ -82,10 +87,15 @@ public class RobotContainer {
     }
 
     private void configureButtonBindings() {
+        new JoystickButton(buttonBox, 3).onTrue(autoComands.toNote());
+
         PathPlannerPath spin = PathPlannerPath.fromPathFile("Spin");
         driverJoytick.leftBumper().onTrue(swerveSubsystem.zeroHeadingCommand());
         driverJoytick.rightBumper().onTrue(AutoBuilder.followPath(spin));
-        //cool spin move
+        //new JoystickButton(buttonBox, 3).onTrue(PathPlan);
+        //new JoystickButton(buttonBox, 4).onTrue(autoComands.PathToPose(1, 1, 0));
+    }
+        // //cool spin move
         // new JoystickButton(buttonBox, 2).onTrue(Commands.runOnce(() -> {
         //     //get current pose
         //     Pose2d currentPose = swerveSubsystem.getPose();
@@ -110,34 +120,6 @@ public class RobotContainer {
 
         //     AutoBuilder.followPath(path).schedule();
         //     }));
-
-            new JoystickButton(buttonBox, 1).onTrue(Commands.runOnce(() -> {
-            //get current pose
-            Pose2d currentPose = swerveSubsystem.getPose();
-
-            //make start, mid, and end pose
-            Pose2d startPos = new Pose2d(currentPose.getTranslation(), new Rotation2d());
-            Pose2d midPos = new Pose2d(currentPose.getTranslation().plus(new Translation2d(1.0, -0.5)), new Rotation2d());
-            Pose2d endPos = new Pose2d(currentPose.getTranslation().plus(new Translation2d(2.0, 0.0)), new Rotation2d());
-
-            List<Translation2d> bezierPoints = PathPlannerPath.bezierFromPoses(startPos, midPos, endPos);
-            PathPlannerPath path = new PathPlannerPath(
-                bezierPoints, 
-                new PathConstraints(
-                3.81, 2.0, 
-                Units.degreesToRadians(360), Units.degreesToRadians(540)
-                ),  
-                new GoalEndState(0.0, Rotation2d.fromDegrees(0))
-            );
-
-            // Prevent this path from being flipped on the red alliance, since the given positions are already correct
-            path.preventFlipping = true;
-
-            AutoBuilder.followPath(path).schedule();
-            }));
-
-            new JoystickButton(buttonBox, 3).onTrue(autoComands.amp());
-        }
 
     public Command getAutonomousCommand() {
         swerveSubsystem.zeroHeading();
