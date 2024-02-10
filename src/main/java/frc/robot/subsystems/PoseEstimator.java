@@ -53,7 +53,7 @@ public class PoseEstimator extends SubsystemBase {
     }
 
     private void updatePoseEstimator() {
-        Optional<EstimatedRobotPose> visionMeasurement = vision.getEstimatedGlobalPose(swerve.getPose());
+        Optional<EstimatedRobotPose> visionMeasurement = Optional.empty(); //vision.getEstimatedGlobalPose(swerve.getPose());
         double velocity = Math.sqrt(swerve.getChassisSpeed().vxMetersPerSecond*swerve.getChassisSpeed().vxMetersPerSecond + swerve.getChassisSpeed().vyMetersPerSecond*swerve.getChassisSpeed().vyMetersPerSecond);
         double angularVelocity = swerve.getChassisSpeed().omegaRadiansPerSecond;
         Pose2d currentPose = getPose();

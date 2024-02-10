@@ -239,7 +239,7 @@ public class SwerveSubsystem extends SubsystemBase {
         SmartDashboard.putNumber("Encoder position BR", backRight.getTurningPosition());
         //SmartDashboard.putData("Field", m_field);
         //m_field.setRobotPose(odometer.getPoseMeters());
-        vision.getEstimatedGlobalPose(getPose());
+        // vision.getEstimatedGlobalPose(getPose());
         //updatePose();
 
     }

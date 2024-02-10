@@ -47,6 +47,7 @@ import frc.robot.Constants.AutoConstants;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.OIConstants;
 import frc.robot.commands.AutoCommand;
+import frc.robot.commands.DriveToPose;
 import frc.robot.commands.SwerveJoystickCmd;
 import frc.robot.subsystems.PoseEstimator;
 import frc.robot.subsystems.SwerveSubsystem;
@@ -57,6 +58,7 @@ import frc.robot.subsystems.Vision;
 public class RobotContainer {
     private final Vision vision = new Vision();
     private final SwerveSubsystem swerveSubsystem = new SwerveSubsystem(vision);
+    private final DriveToPose driveToPose = new DriveToPose(vision, swerveSubsystem);
     private final PoseEstimator poseEstimator = new PoseEstimator(swerveSubsystem, vision, new Pose2d(2, 7, swerveSubsystem.getRotation2d()));
     private AutoCommand autoComands = new AutoCommand(vision, swerveSubsystem);
     private final CommandXboxController driverJoytick = new CommandXboxController(OIConstants.kDriverControllerPort);
@@ -73,8 +75,6 @@ public class RobotContainer {
                 () -> -driverJoytick.getRawAxis(OIConstants.kDriverRotAxis),
                 () -> !driverJoytick.b().getAsBoolean()));
 
-        NamedCommands.registerCommand("PathPlan", autoComands.toNote());
-
 
         configureButtonBindings();
 
@@ -89,9 +89,7 @@ public class RobotContainer {
     private void configureButtonBindings() {
         new JoystickButton(buttonBox, 3).onTrue(autoComands.toNote());
 
-        PathPlannerPath spin = PathPlannerPath.fromPathFile("Spin");
         driverJoytick.leftBumper().onTrue(swerveSubsystem.zeroHeadingCommand());
-        driverJoytick.rightBumper().onTrue(AutoBuilder.followPath(spin));
         //new JoystickButton(buttonBox, 3).onTrue(PathPlan);
         //new JoystickButton(buttonBox, 4).onTrue(autoComands.PathToPose(1, 1, 0));
     }
