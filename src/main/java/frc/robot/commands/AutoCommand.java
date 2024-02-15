@@ -13,6 +13,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
@@ -91,20 +92,30 @@ public class AutoCommand {
     }
 
     public Command toNote(){
-        Command calc = Commands.run(() -> {
+        Command calc = Commands.runOnce(() -> {
 
-        
         Pose2d currentPose = swerveSubsystem.getPose();
         double noteDistance = vision.getNoteDistance();
+        double noteYDistance = vision.getNoteY();
+        System.out.println("step 1");
+
+        double noteX = currentPose.getX() + noteDistance;
+        double noteY = currentPose.getY() + noteYDistance;
+
+
         // Since we are using a holonomic drivetrain, the rotation component of this pose
         // represents the goal holonomic rotation
-        Pose2d targetPose = new Pose2d(currentPose.getTranslation().plus(new Translation2d(noteDistance, 0.0)), new Rotation2d());
+        //get x value and add in a speerate varible then put that into the pose, get rid of .plus
+        Pose2d targetPose = new Pose2d(noteX, noteY, Rotation2d.fromDegrees(0));
+        //Pose2d targetPose = new Pose2d(10, 5, Rotation2d.fromDegrees(180));
 
+        System.out.println("Step 2");
+        //SmartDashboard.("Pose", currentPose.getTranslation().plus(new Translation2d(noteDistance, noteY)));
         // Create the constraints to use while pathfinding
         PathConstraints constraints = new PathConstraints(
-                1, 0.5,
+                2, 1,
                 Units.degreesToRadians(540), Units.degreesToRadians(720));
-
+        System.out.println("Step 3");
         // Since AutoBuilder is configured, we can use it to build pathfinding commands
         // Command pathfindingCommand = 
         AutoBuilder.pathfindToPose(
@@ -113,6 +124,7 @@ public class AutoCommand {
                 0.0, // Goal end velocity in meters/sec
                 0.0 // Rotation delay distance in meters. This is how far the robot should travel before attempting to rotate.
         ).schedule();
+        System.out.println("Step 4");
         });
         return calc;
     }

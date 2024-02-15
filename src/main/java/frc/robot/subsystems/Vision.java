@@ -12,10 +12,13 @@ import org.photonvision.PhotonUtils;
 import org.photonvision.PhotonVersion;
 import org.photonvision.targeting.PhotonTrackedTarget;
 
+import com.ctre.phoenix.sensors.WPI_PigeonIMU;
+
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation3d;
@@ -23,11 +26,13 @@ import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class Vision extends SubsystemBase {
     AprilTagFieldLayout aprilTagFieldLayout;
     // PhotonCamera camera = new PhotonCamera("photonvision");
+    NetworkTable table = NetworkTableInstance.getDefault().getTable("limelight");
 
     Transform3d robotToCam = new Transform3d(new Translation3d(-0.305, .3302, 0.305), new Rotation3d(0,0,45));
     // PhotonPoseEstimator photonPoseEstimator; 
@@ -84,9 +89,19 @@ public class Vision extends SubsystemBase {
 
         return distanceFromLimelightToGoalM;
     }
+        public double getNoteY(){
+        NetworkTableEntry tx = table.getEntry("tx");
+        double targetOffset = tx.getDouble(0.0);
+        double targetOffsetDegree = targetOffset * Math.PI/180;
+        
+        double noteY = Math.tan(targetOffsetDegree) * getNoteDistance();
+
+        return noteY;
+    }
 
     @Override
     public void periodic() {
         SmartDashboard.putNumber("Note Distance", getNoteDistance());
+        SmartDashboard.putNumber("Note Y", getNoteY());
     }
 }
