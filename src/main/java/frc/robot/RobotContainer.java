@@ -48,9 +48,11 @@ import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.OIConstants;
 import frc.robot.commands.AutoCommand;
 import frc.robot.commands.SwerveJoystickCmd;
+import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.PoseEstimator;
 import frc.robot.subsystems.SwerveSubsystem;
 import frc.robot.subsystems.Vision;
+import pabeles.concurrency.IntRangeTask;
 
 
 
@@ -61,6 +63,7 @@ public class RobotContainer {
     private AutoCommand autoComands = new AutoCommand(vision, swerveSubsystem);
     private final CommandXboxController driverJoytick = new CommandXboxController(OIConstants.kDriverControllerPort);
     private final Joystick buttonBox = new Joystick(1);
+    private Intake intakeUse = new Intake();
 
     private final SendableChooser<Command> autoChooser;
 
@@ -92,9 +95,9 @@ public class RobotContainer {
         PathPlannerPath spin = PathPlannerPath.fromPathFile("Spin");
         driverJoytick.leftBumper().onTrue(swerveSubsystem.zeroHeadingCommand());
         driverJoytick.rightBumper().onTrue(AutoBuilder.followPath(spin));
-        //new JoystickButton(buttonBox, 3).onTrue(PathPlan);
-        //new JoystickButton(buttonBox, 4).onTrue(autoComands.PathToPose(1, 1, 0));
-    }
+         new JoystickButton(buttonBox, 3).onTrue(intakeUse.toggle(0.1));}
+        // new JoystickButton(buttonBox, 4).onTrue(autoComands.PathToPose(1, 1, 0));
+    
         // //cool spin move
         // new JoystickButton(buttonBox, 2).onTrue(Commands.runOnce(() -> {
         //     //get current pose
@@ -124,5 +127,7 @@ public class RobotContainer {
     public Command getAutonomousCommand() {
         swerveSubsystem.zeroHeading();
         return autoChooser.getSelected();
-  }
+  
+
+}
 }
