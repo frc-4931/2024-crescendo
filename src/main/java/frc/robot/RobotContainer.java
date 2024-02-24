@@ -57,10 +57,10 @@ import pabeles.concurrency.IntRangeTask;
 
 
 public class RobotContainer {
-    private final Vision vision = new Vision();
-    private final SwerveSubsystem swerveSubsystem = new SwerveSubsystem(vision);
-    private final PoseEstimator poseEstimator = new PoseEstimator(swerveSubsystem, vision, new Pose2d(2, 7, swerveSubsystem.getRotation2d()));
-    private AutoCommand autoComands = new AutoCommand(vision, swerveSubsystem);
+     private final Vision vision = new Vision();
+     private final SwerveSubsystem swerveSubsystem = new SwerveSubsystem(vision);
+     private final PoseEstimator poseEstimator = new PoseEstimator(swerveSubsystem, vision, new Pose2d(2, 7, swerveSubsystem.getRotation2d()));
+     private AutoCommand autoComands = new AutoCommand(vision, swerveSubsystem);
     private final CommandXboxController driverJoytick = new CommandXboxController(OIConstants.kDriverControllerPort);
     private final Joystick buttonBox = new Joystick(1);
     private Intake intakeUse = new Intake();
@@ -76,7 +76,7 @@ public class RobotContainer {
                 () -> -driverJoytick.getRawAxis(OIConstants.kDriverRotAxis),
                 () -> !driverJoytick.b().getAsBoolean()));
 
-        NamedCommands.registerCommand("PathPlan", autoComands.toNote());
+        // NamedCommands.registerCommand("PathPlan", autoComands.toNote());
 
 
         configureButtonBindings();
@@ -90,12 +90,13 @@ public class RobotContainer {
     }
 
     private void configureButtonBindings() {
-        new JoystickButton(buttonBox, 3).onTrue(autoComands.toNote());
+        // new JoystickButton(buttonBox, 1).onTrue(autoComands.toNote());
 
-        PathPlannerPath spin = PathPlannerPath.fromPathFile("Spin");
+       // PathPlannerPath spin = PathPlannerPath.fromPathFile("Spin");
         driverJoytick.leftBumper().onTrue(swerveSubsystem.zeroHeadingCommand());
-        driverJoytick.rightBumper().onTrue(AutoBuilder.followPath(spin));
-         new JoystickButton(buttonBox, 3).onTrue(intakeUse.toggle(0.1));}
+     //   driverJoytick.rightBumper().onTrue(AutoBuilder.followPath(spin));
+         new JoystickButton(buttonBox, 2).onTrue(intakeUse.toggle(0.1));
+    }
         // new JoystickButton(buttonBox, 4).onTrue(autoComands.PathToPose(1, 1, 0));
     
         // //cool spin move

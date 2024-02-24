@@ -20,8 +20,7 @@ public class Intake extends SubsystemBase {
         intakeMotor = new CANSparkMax(9 , kMotorType);
     }
     public Command toggle(double speed) {
-        isOn = !(isOn);
-        return this.runOnce(() -> setSpeed(speed));
+        return this.runOnce(() -> {isOn = !(isOn); setSpeed(speed);});
     }
     public void turnOn(double speed) {
         isOn = true;
@@ -30,18 +29,18 @@ public class Intake extends SubsystemBase {
     
     public void turnOff(double speed) {
         isOn = false;
-        setSpeed(speed);
+        setSpeed(0);
     }
     /**
      * Speed Should NEVER exceed the domain (-1,1)
      * @param speed
      */
     private void setSpeed(double speed) {
-    if (isOn) {
-      intakeMotor.set(speed);
-    } else {
-      intakeMotor.set(0);
-    }
+        if(isOn) {
+              intakeMotor.set(speed);
+        }
+        else {intakeMotor.set(0);}
+
 
     SmartDashboard.putBoolean("Intake", isOn);
     }
