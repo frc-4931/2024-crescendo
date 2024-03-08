@@ -99,7 +99,6 @@ public final class Constants {
 
         public static final double kDeadband = 0.05;
     }
-
     public static final class VisionConstants {
         public static final double kPoseErrorAcceptance = 2.0; // How much error there can be between current stimated pose and vision pose in meters
       }

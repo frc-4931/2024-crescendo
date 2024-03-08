@@ -50,6 +50,7 @@ import frc.robot.commands.AutoCommand;
 import frc.robot.commands.SwerveJoystickCmd;
 import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.PoseEstimator;
+import frc.robot.subsystems.Shooter;
 import frc.robot.subsystems.SwerveSubsystem;
 import frc.robot.subsystems.Vision;
 import pabeles.concurrency.IntRangeTask;
@@ -64,6 +65,7 @@ public class RobotContainer {
     private final CommandXboxController driverJoytick = new CommandXboxController(OIConstants.kDriverControllerPort);
     private final Joystick buttonBox = new Joystick(1);
     private Intake intakeUse = new Intake();
+    private Shooter shooterUse = new Shooter();
 
     private final SendableChooser<Command> autoChooser;
 
@@ -94,8 +96,13 @@ public class RobotContainer {
 
        // PathPlannerPath spin = PathPlannerPath.fromPathFile("Spin");
         driverJoytick.leftBumper().onTrue(swerveSubsystem.zeroHeadingCommand());
+        driverJoytick.leftTrigger().onTrue(intakeUse.toggle(0.1));
+        driverJoytick.rightTrigger().onTrue(shooterUse.toggleSlow(0.1));
+        driverJoytick.y().onTrue(intakeUse.toggle(0.7));
      //   driverJoytick.rightBumper().onTrue(AutoBuilder.followPath(spin));
-         new JoystickButton(buttonBox, 2).onTrue(intakeUse.toggle(0.1));
+         new JoystickButton(buttonBox, 1).onTrue(intakeUse.toggle(0.7));
+         new JoystickButton(buttonBox, 2).onTrue(shooterUse.toggleFast(0.1));
+         new JoystickButton(buttonBox, 3).onTrue(shooterUse.toggleSlow(0.1));
     }
         // new JoystickButton(buttonBox, 4).onTrue(autoComands.PathToPose(1, 1, 0));
     
