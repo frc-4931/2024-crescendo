@@ -1,85 +1,52 @@
 package frc.robot;
 
-import java.io.IOException;
-import java.nio.file.Path;
-import java.util.List;
-
-import org.photonvision.PhotonCamera;
-
 import com.pathplanner.lib.auto.AutoBuilder;
-import com.pathplanner.lib.auto.NamedCommands;
-import com.pathplanner.lib.commands.PathPlannerAuto;
-import com.pathplanner.lib.path.GoalEndState;
-import com.pathplanner.lib.path.PathConstraints;
-import com.pathplanner.lib.path.PathPlannerPath;
 
-import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.Filesystem;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.Joystick;
-import edu.wpi.first.wpilibj.XboxController;
-import edu.wpi.first.wpilibj.PS4Controller.Button;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.cameraserver.CameraServer;
-import edu.wpi.first.math.controller.PIDController;
-import edu.wpi.first.math.controller.ProfiledPIDController;
-import edu.wpi.first.math.controller.RamseteController;
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.trajectory.Trajectory;
-import edu.wpi.first.math.trajectory.TrajectoryConfig;
-import edu.wpi.first.math.trajectory.TrajectoryGenerator;
-import edu.wpi.first.math.trajectory.TrajectoryUtil;
-import edu.wpi.first.math.util.Units;
-import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.PrintCommand;
-import edu.wpi.first.wpilibj2.command.RamseteCommand;
-import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
-import edu.wpi.first.wpilibj2.command.SwerveControllerCommand;
+import edu.wpi.first.wpilibj2.command.FunctionalCommand;
+import edu.wpi.first.wpilibj2.command.button.CommandJoystick;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
-import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
-import frc.robot.Constants.AutoConstants;
-import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.OIConstants;
 import frc.robot.commands.AutoCommand;
 import frc.robot.commands.SwerveJoystickCmd;
-import frc.robot.subsystems.Intake;
+import frc.robot.subsystems.DoubleMotor;
+import frc.robot.subsystems.Pneumatics;
 import frc.robot.subsystems.PoseEstimator;
 import frc.robot.subsystems.Shooter;
 import frc.robot.subsystems.SwerveSubsystem;
 import frc.robot.subsystems.Vision;
-import pabeles.concurrency.IntRangeTask;
-
-
 
 public class RobotContainer {
-     private final Vision vision = new Vision();
-     private final SwerveSubsystem swerveSubsystem = new SwerveSubsystem(vision);
-     private final PoseEstimator poseEstimator = new PoseEstimator(swerveSubsystem, vision, new Pose2d(2, 7, swerveSubsystem.getRotation2d()));
-     private AutoCommand autoComands = new AutoCommand(vision, swerveSubsystem);
-    private final CommandXboxController driverJoytick = new CommandXboxController(OIConstants.kDriverControllerPort);
-    private final Joystick buttonBox = new Joystick(1);
-    private Intake intakeUse = new Intake();
+    private final Vision vision = new Vision();
+    private final SwerveSubsystem swerveSubsystem = new SwerveSubsystem();
+    private final Pneumatics pneumatics = new Pneumatics();
+    private final PoseEstimator poseEstimator = new PoseEstimator(swerveSubsystem, vision,
+            new Pose2d(2, 7, swerveSubsystem.getRotation2d()));
+    private AutoCommand autoComands = new AutoCommand(vision, swerveSubsystem);
+    private final CommandXboxController driverJoystick = new CommandXboxController(OIConstants.kDriverControllerPort);
+    private final CommandJoystick buttonBox = new CommandJoystick(1);
+    private DoubleMotor intakeUse = new DoubleMotor("intake", 0.7, 9, 14);
+    private DoubleMotor conveyer = new DoubleMotor("conveyer", 0.5, 12, 13);
     private Shooter shooterUse = new Shooter();
 
     private final SendableChooser<Command> autoChooser;
 
     public RobotContainer() {
-        //CameraServer.startAutomaticCapture();
+        // CameraServer.startAutomaticCapture();
         swerveSubsystem.setDefaultCommand(new SwerveJoystickCmd(
                 swerveSubsystem,
-                () -> -driverJoytick.getRawAxis(OIConstants.kDriverYAxis),
-                () -> -driverJoytick.getRawAxis(OIConstants.kDriverXAxis),
-                () -> -driverJoytick.getRawAxis(OIConstants.kDriverRotAxis),
-                () -> !driverJoytick.b().getAsBoolean()));
+                () -> -driverJoystick.getRawAxis(OIConstants.kDriverYAxis),
+                () -> -driverJoystick.getRawAxis(OIConstants.kDriverXAxis),
+                () -> -driverJoystick.getRawAxis(OIConstants.kDriverRotAxis),
+                () -> !driverJoystick.b().getAsBoolean()));
 
         // NamedCommands.registerCommand("PathPlan", autoComands.toNote());
-
 
         configureButtonBindings();
 
@@ -88,54 +55,68 @@ public class RobotContainer {
         SmartDashboard.putData("StraightAuto", autoChooser);
         SmartDashboard.putData("curvyAuto", autoChooser);
 
-
     }
 
     private void configureButtonBindings() {
         // new JoystickButton(buttonBox, 1).onTrue(autoComands.toNote());
 
-       // PathPlannerPath spin = PathPlannerPath.fromPathFile("Spin");
-        driverJoytick.leftBumper().onTrue(swerveSubsystem.zeroHeadingCommand());
-        driverJoytick.leftTrigger().onTrue(intakeUse.toggle(0.1));
-        driverJoytick.rightTrigger().onTrue(shooterUse.toggleSlow(0.1));
-        driverJoytick.y().onTrue(intakeUse.toggle(0.7));
-     //   driverJoytick.rightBumper().onTrue(AutoBuilder.followPath(spin));
-         new JoystickButton(buttonBox, 1).onTrue(intakeUse.toggle(0.7));
-         new JoystickButton(buttonBox, 2).onTrue(shooterUse.toggleFast(0.1));
-         new JoystickButton(buttonBox, 3).onTrue(shooterUse.toggleSlow(0.1));
+        // PathPlannerPath spin = PathPlannerPath.fromPathFile("Spin");
+        driverJoystick.leftBumper().onTrue(swerveSubsystem.zeroHeadingCommand());
+        // driverJoytick.leftTrigger().onTrue(intakeUse.toggle(0.1));
+        driverJoystick.rightTrigger().onTrue(shooterUse.toggleSlow(0.1));
+        driverJoystick.a().onTrue(intakeUse.toggle());
+        driverJoystick.b().onTrue(conveyer.toggle());
+
+        // FIXME: need to get a stop from the throughbeam
+        // DigitalInput diThroughBeam = new DigitalInput(0);
+        // Command autoOff = new FunctionalCommand(() -> { intakeUse.turnOn(); conveyer.turnOn(); },
+        //     () -> {},
+        //     interrupted -> { intakeUse.turnOff(); conveyer.turnOff(); },
+        //     () -> diThroughBeam.get(),
+        //     intakeUse, conveyer
+        // );
+        
+        
+        // driverJoytick.rightBumper().onTrue(AutoBuilder.followPath(spin));
+        // buttonBox.button(1).onTrue(intakeUse.toggle(0.7));
+        buttonBox.button(2).onTrue(shooterUse.toggleFast(0.1));
+        buttonBox.button(3).onTrue(shooterUse.toggleSlow(0.1));
     }
-        // new JoystickButton(buttonBox, 4).onTrue(autoComands.PathToPose(1, 1, 0));
-    
-        // //cool spin move
-        // new JoystickButton(buttonBox, 2).onTrue(Commands.runOnce(() -> {
-        //     //get current pose
-        //     Pose2d currentPose = swerveSubsystem.getPose();
+    // new JoystickButton(buttonBox, 4).onTrue(autoComands.PathToPose(1, 1, 0));
 
-        //     //make start, mid, and end pose
-        //     Pose2d startPos = new Pose2d(currentPose.getTranslation(), new Rotation2d());
-        //     Pose2d midPos = new Pose2d(currentPose.getTranslation().plus(new Translation2d(1.0, 0.5)), new Rotation2d());
-        //     Pose2d endPos = new Pose2d(currentPose.getTranslation().plus(new Translation2d(2.0, 0.0)), new Rotation2d());
+    // //cool spin move
+    // new JoystickButton(buttonBox, 2).onTrue(Commands.runOnce(() -> {
+    // //get current pose
+    // Pose2d currentPose = swerveSubsystem.getPose();
 
-        //     List<Translation2d> bezierPoints = PathPlannerPath.bezierFromPoses(startPos, midPos, endPos);
-        //     PathPlannerPath path = new PathPlannerPath(
-        //         bezierPoints, 
-        //         new PathConstraints(
-        //         3.81, 2.0, 
-        //         Units.degreesToRadians(360), Units.degreesToRadians(540)
-        //         ),  
-        //         new GoalEndState(0.0, Rotation2d.fromDegrees(0))
-        //     );
+    // //make start, mid, and end pose
+    // Pose2d startPos = new Pose2d(currentPose.getTranslation(), new Rotation2d());
+    // Pose2d midPos = new Pose2d(currentPose.getTranslation().plus(new
+    // Translation2d(1.0, 0.5)), new Rotation2d());
+    // Pose2d endPos = new Pose2d(currentPose.getTranslation().plus(new
+    // Translation2d(2.0, 0.0)), new Rotation2d());
 
-        //     // Prevent this path from being flipped on the red alliance, since the given positions are already correct
-        //     path.preventFlipping = true;
+    // List<Translation2d> bezierPoints = PathPlannerPath.bezierFromPoses(startPos,
+    // midPos, endPos);
+    // PathPlannerPath path = new PathPlannerPath(
+    // bezierPoints,
+    // new PathConstraints(
+    // 3.81, 2.0,
+    // Units.degreesToRadians(360), Units.degreesToRadians(540)
+    // ),
+    // new GoalEndState(0.0, Rotation2d.fromDegrees(0))
+    // );
 
-        //     AutoBuilder.followPath(path).schedule();
-        //     }));
+    // // Prevent this path from being flipped on the red alliance, since the given
+    // positions are already correct
+    // path.preventFlipping = true;
+
+    // AutoBuilder.followPath(path).schedule();
+    // }));
 
     public Command getAutonomousCommand() {
         swerveSubsystem.zeroHeading();
         return autoChooser.getSelected();
-  
 
-}
+    }
 }
