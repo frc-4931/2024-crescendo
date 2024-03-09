@@ -48,19 +48,24 @@ import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.OIConstants;
 import frc.robot.commands.AutoCommand;
 import frc.robot.commands.SwerveJoystickCmd;
+import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.PoseEstimator;
+import frc.robot.subsystems.Shooter;
 import frc.robot.subsystems.SwerveSubsystem;
 import frc.robot.subsystems.Vision;
+import pabeles.concurrency.IntRangeTask;
 
 
 
 public class RobotContainer {
-    private final Vision vision = new Vision();
-    private final SwerveSubsystem swerveSubsystem = new SwerveSubsystem(vision);
-    private final PoseEstimator poseEstimator = new PoseEstimator(swerveSubsystem, vision, new Pose2d(2, 7, swerveSubsystem.getRotation2d()));
-    private AutoCommand autoComands = new AutoCommand(vision, swerveSubsystem);
+     private final Vision vision = new Vision();
+     private final SwerveSubsystem swerveSubsystem = new SwerveSubsystem(vision);
+     private final PoseEstimator poseEstimator = new PoseEstimator(swerveSubsystem, vision, new Pose2d(2, 7, swerveSubsystem.getRotation2d()));
+     private AutoCommand autoComands = new AutoCommand(vision, swerveSubsystem);
     private final CommandXboxController driverJoytick = new CommandXboxController(OIConstants.kDriverControllerPort);
     private final Joystick buttonBox = new Joystick(1);
+    private Intake intakeUse = new Intake();
+    private Shooter shooterUse = new Shooter();
 
     private final SendableChooser<Command> autoChooser;
 
@@ -73,7 +78,7 @@ public class RobotContainer {
                 () -> -driverJoytick.getRawAxis(OIConstants.kDriverRotAxis),
                 () -> !driverJoytick.b().getAsBoolean()));
 
-        NamedCommands.registerCommand("PathPlan", autoComands.toNote());
+        // NamedCommands.registerCommand("PathPlan", autoComands.toNote());
 
 
         configureButtonBindings();
@@ -87,14 +92,20 @@ public class RobotContainer {
     }
 
     private void configureButtonBindings() {
-        new JoystickButton(buttonBox, 3).onTrue(autoComands.toNote());
+        // new JoystickButton(buttonBox, 1).onTrue(autoComands.toNote());
 
-        PathPlannerPath spin = PathPlannerPath.fromPathFile("Spin");
+       // PathPlannerPath spin = PathPlannerPath.fromPathFile("Spin");
         driverJoytick.leftBumper().onTrue(swerveSubsystem.zeroHeadingCommand());
-        driverJoytick.rightBumper().onTrue(AutoBuilder.followPath(spin));
-        //new JoystickButton(buttonBox, 3).onTrue(PathPlan);
-        //new JoystickButton(buttonBox, 4).onTrue(autoComands.PathToPose(1, 1, 0));
+        driverJoytick.leftTrigger().onTrue(intakeUse.toggle(0.1));
+        driverJoytick.rightTrigger().onTrue(shooterUse.toggleSlow(0.1));
+        driverJoytick.y().onTrue(intakeUse.toggle(0.7));
+     //   driverJoytick.rightBumper().onTrue(AutoBuilder.followPath(spin));
+         new JoystickButton(buttonBox, 1).onTrue(intakeUse.toggle(0.7));
+         new JoystickButton(buttonBox, 2).onTrue(shooterUse.toggleFast(0.1));
+         new JoystickButton(buttonBox, 3).onTrue(shooterUse.toggleSlow(0.1));
     }
+        // new JoystickButton(buttonBox, 4).onTrue(autoComands.PathToPose(1, 1, 0));
+    
         // //cool spin move
         // new JoystickButton(buttonBox, 2).onTrue(Commands.runOnce(() -> {
         //     //get current pose
@@ -124,5 +135,7 @@ public class RobotContainer {
     public Command getAutonomousCommand() {
         swerveSubsystem.zeroHeading();
         return autoChooser.getSelected();
-  }
+  
+
+}
 }
