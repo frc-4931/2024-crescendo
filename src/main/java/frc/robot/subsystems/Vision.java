@@ -66,7 +66,11 @@ public class Vision {
     public double[] getLatestPose3d() {
         return poses.size() == 0 ? new double[7] : poses.remove(0);
     }
-
+    public double getTx() {
+        NetworkTable table = NetworkTableInstance.getDefault().getTable("limelight");
+        NetworkTableEntry tx = table.getEntry("tx");
+        return tx.getDouble(0.0);
+    }
     public double getNoteDistance(){
         NetworkTable table = NetworkTableInstance.getDefault().getTable("limelight");
         NetworkTableEntry ty = table.getEntry("ty");

@@ -47,6 +47,7 @@ import frc.robot.Constants.AutoConstants;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.OIConstants;
 import frc.robot.commands.AutoCommand;
+import frc.robot.commands.LockOnNote;
 import frc.robot.commands.SwerveJoystickCmd;
 import frc.robot.subsystems.PoseEstimator;
 import frc.robot.subsystems.SwerveSubsystem;
@@ -61,6 +62,7 @@ public class RobotContainer {
     private AutoCommand autoComands = new AutoCommand(vision, swerveSubsystem);
     private final CommandXboxController driverJoytick = new CommandXboxController(OIConstants.kDriverControllerPort);
     private final Joystick buttonBox = new Joystick(1);
+    private final LockOnNote lockOn = new LockOnNote(vision, swerveSubsystem);
 
     private final SendableChooser<Command> autoChooser;
 
@@ -89,9 +91,11 @@ public class RobotContainer {
     private void configureButtonBindings() {
         new JoystickButton(buttonBox, 3).onTrue(autoComands.toNote());
 
-        PathPlannerPath spin = PathPlannerPath.fromPathFile("Spin");
+        //PathPlannerPath spin = PathPlannerPath.fromPathFile("Spin");
         driverJoytick.leftBumper().onTrue(swerveSubsystem.zeroHeadingCommand());
-        driverJoytick.rightBumper().onTrue(AutoBuilder.followPath(spin));
+        //driverJoytick.rightBumper().onTrue(AutoBuilder.followPath(spin));
+
+        driverJoytick.x().whileTrue(lockOn);
         //new JoystickButton(buttonBox, 3).onTrue(PathPlan);
         //new JoystickButton(buttonBox, 4).onTrue(autoComands.PathToPose(1, 1, 0));
     }
