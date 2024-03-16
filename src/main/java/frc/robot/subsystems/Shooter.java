@@ -3,6 +3,7 @@ package frc.robot.subsystems;
 import com.revrobotics.CANSparkLowLevel;
 import com.revrobotics.CANSparkMax;
 
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
@@ -11,6 +12,7 @@ public class Shooter extends SubsystemBase{
     private CANSparkMax shootMotor2;
     private boolean isRunning;
     private boolean isFast;
+    private double speed = -0.5;
     private static final CANSparkLowLevel.MotorType kMotorType = CANSparkLowLevel.MotorType.kBrushless;
 
     public Shooter() {
@@ -18,22 +20,35 @@ public class Shooter extends SubsystemBase{
         isFast    = false;
         shootMotor1 = new CANSparkMax(10, kMotorType);
         shootMotor2 = new CANSparkMax(11, kMotorType);
+        SmartDashboard.putNumber("shooter", speed);
     }
     /**
      * to be used by RobotContainer. will toggle shooter
      * @param speed
      * @return
      */
-    public Command toggleSlow(double speed) {
-        return this.runOnce(() -> {isFast = false; isRunning = !(isRunning); makeSpeed(speed);});
+    public Command toggleSlow() {
+        return this.runOnce(() -> toggle(this::runSlow));
+            // () -> {isFast = false; isRunning = !(isRunning); makeSpeed(speed/2);});
     }
+
+    private void toggle(Runnable r) {
+        if (isRunning) {
+            stop();
+         }
+         else {
+            r.run();
+         }
+    }
+
     /**
      * to be used by RobotContainer. will also toggle shooter, but faster
      * @param speed
      * @return
      */
-    public Command toggleFast(double speed) {
-        return this.runOnce(() -> {isFast = true; isRunning = !(isRunning); makeSpeed(speed);});
+    public Command toggleFast() {
+        return this.runOnce(() -> toggle(this::runFast));
+        //  {isFast = true; isRunning = !(isRunning); makeSpeed(speed);});
     }
     /**
      * stops the motors
@@ -46,16 +61,16 @@ public class Shooter extends SubsystemBase{
      * Ideal for amp
      * @param speed
      */
-    public void runSlow(double speed) {
+    public void runSlow() {
         isRunning = true;
         isFast = false;
-        makeSpeed(speed);
+        makeSpeed(speed/2);
     }
     /**
      * better for shooting upward and outward
      * @param speed
      */
-    public void runFast(double speed) {
+    public void runFast() {
         isRunning = true;
         isFast = true;
         makeSpeed(speed);
@@ -66,20 +81,29 @@ public class Shooter extends SubsystemBase{
      * @param speed
      */
     private void makeSpeed(double speed) {
-        if(isRunning) {
-            if(isFast) {
+        // if(isRunning) {
+        //     if(isFast) {
             shootMotor1.set(speed);
             shootMotor2.set(speed);
-            }
-            else {
-            shootMotor1.set(speed/2);
-            shootMotor2.set(speed/2);
-            }
-        }
-        else {
-            shootMotor1.set(0);
-            shootMotor2.set(0);
-        }
+        //     }
+        //     else {
+        //     shootMotor1.set(speed/2);
+        //     shootMotor2.set(speed/2);
+        //     }
+        // }
+        // else {
+        //     shootMotor1.set(0);
+        //     shootMotor2.set(0);
+        // }
     }
 
+    @Override
+    public void periodic() {
+        // TODO Auto-generated method stub
+        super.periodic();
+        var s = SmartDashboard.getNumber("shooter", 0);
+        if (s != speed) {
+            speed = s;
+        }
+    }
 }

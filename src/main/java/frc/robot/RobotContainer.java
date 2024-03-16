@@ -16,23 +16,23 @@ import frc.robot.Constants.OIConstants;
 import frc.robot.commands.AutoCommand;
 import frc.robot.commands.SwerveJoystickCmd;
 import frc.robot.subsystems.DoubleMotor;
-import frc.robot.subsystems.Pneumatics;
+//import frc.robot.subsystems.Pneumatics;
 import frc.robot.subsystems.PoseEstimator;
 import frc.robot.subsystems.Shooter;
 import frc.robot.subsystems.SwerveSubsystem;
 import frc.robot.subsystems.Vision;
 
 public class RobotContainer {
-    private final Vision vision = new Vision();
+   // private final Vision vision = new Vision();
     private final SwerveSubsystem swerveSubsystem = new SwerveSubsystem();
-    private final Pneumatics pneumatics = new Pneumatics();
-    private final PoseEstimator poseEstimator = new PoseEstimator(swerveSubsystem, vision,
-            new Pose2d(2, 7, swerveSubsystem.getRotation2d()));
-    private AutoCommand autoComands = new AutoCommand(vision, swerveSubsystem);
+    //private final Pneumatics pneumatics = new Pneumatics();
+    // private final PoseEstimator poseEstimator = new PoseEstimator(swerveSubsystem, vision,
+    //         new Pose2d(2, 7, swerveSubsystem.getRotation2d()));
+    // private AutoCommand autoComands = new AutoCommand(vision, swerveSubsystem);
     private final CommandXboxController driverJoystick = new CommandXboxController(OIConstants.kDriverControllerPort);
     private final CommandJoystick buttonBox = new CommandJoystick(1);
-    private DoubleMotor intakeUse = new DoubleMotor("intake", 0.7, 9, 14);
-    private DoubleMotor conveyer = new DoubleMotor("conveyer", 0.5, 12, 13);
+    private DoubleMotor intakeUse = new DoubleMotor("intake", 0.6, 0.4, 9, 14);
+    private DoubleMotor conveyer = new DoubleMotor("conveyer", -0.6, 0.6, 12, 13);
     private Shooter shooterUse = new Shooter();
 
     private final SendableChooser<Command> autoChooser;
@@ -54,6 +54,7 @@ public class RobotContainer {
 
         SmartDashboard.putData("StraightAuto", autoChooser);
         SmartDashboard.putData("curvyAuto", autoChooser);
+        
 
     }
 
@@ -63,24 +64,28 @@ public class RobotContainer {
         // PathPlannerPath spin = PathPlannerPath.fromPathFile("Spin");
         driverJoystick.leftBumper().onTrue(swerveSubsystem.zeroHeadingCommand());
         // driverJoytick.leftTrigger().onTrue(intakeUse.toggle(0.1));
-        driverJoystick.rightTrigger().onTrue(shooterUse.toggleSlow(0.1));
+        driverJoystick.rightTrigger().onTrue(shooterUse.toggleSlow());
         driverJoystick.a().onTrue(intakeUse.toggle());
         driverJoystick.b().onTrue(conveyer.toggle());
+        // driverJoystick.y().onTrue(intakeUse.reverse());
 
-        // FIXME: need to get a stop from the throughbeam
-        // DigitalInput diThroughBeam = new DigitalInput(0);
+        //FIXME: need to get a stop from the throughbeam
+        DigitalInput diThroughBeam = new DigitalInput(0);
         // Command autoOff = new FunctionalCommand(() -> { intakeUse.turnOn(); conveyer.turnOn(); },
         //     () -> {},
         //     interrupted -> { intakeUse.turnOff(); conveyer.turnOff(); },
         //     () -> diThroughBeam.get(),
         //     intakeUse, conveyer
         // );
+        SmartDashboard.putBoolean("Through Beam", diThroughBeam.get());
+
+
         
         
         // driverJoytick.rightBumper().onTrue(AutoBuilder.followPath(spin));
         // buttonBox.button(1).onTrue(intakeUse.toggle(0.7));
-        buttonBox.button(2).onTrue(shooterUse.toggleFast(0.1));
-        buttonBox.button(3).onTrue(shooterUse.toggleSlow(0.1));
+        buttonBox.button(2).onTrue(shooterUse.toggleFast());
+        buttonBox.button(3).onTrue(shooterUse.toggleSlow());
     }
     // new JoystickButton(buttonBox, 4).onTrue(autoComands.PathToPose(1, 1, 0));
 

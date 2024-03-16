@@ -36,7 +36,7 @@ public final class Constants {
         public static final int kFrontLeftDriveMotorPort = 2;
         public static final int kBackLeftDriveMotorPort = 1;
         public static final int kFrontRightDriveMotorPort = 3;
-        public static final int kBackRightDriveMotorPort = 4;
+        public static final int kBackRightDriveMotorPort =  4;
 
         public static final int kFrontLeftTurningMotorPort = 6;
         public static final int kBackLeftTurningMotorPort = 5;
@@ -68,7 +68,7 @@ public final class Constants {
         public static final double kFrontRightDriveAbsoluteEncoderOffsetRad = 1.711;
         public static final double kBackRightDriveAbsoluteEncoderOffsetRad = 2.823;
 
-        public static final double speedMultiplier = .5;
+        public static final double speedMultiplier = .3;
         public static final double turnSpeedMultiplier = .6;
 
         public static final double kPhysicalMaxSpeedMetersPerSecond = 3.81;
