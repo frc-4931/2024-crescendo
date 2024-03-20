@@ -40,6 +40,12 @@ public class DoubleMotor extends SubsystemBase {
             setSpeed(isOn ? speed1 : 0, isOn ? speed2 : 0);
         });
     }
+    public Command toggleReverse() {
+        return this.runOnce(() -> {
+            isOn = !isOn;
+            setSpeed(isOn ? -speed1 : 0, isOn ? -speed2 : 0);
+        });
+    }
 
     public Command on() {
         return this.run(this::turnOn);

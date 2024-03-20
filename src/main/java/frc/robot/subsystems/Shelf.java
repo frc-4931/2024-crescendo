@@ -8,19 +8,21 @@ import edu.wpi.first.wpilibj.PneumaticsModuleType;
 import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class Shelf extends SubsystemBase {
     private Compressor compressor = new Compressor(0, PneumaticsModuleType.CTREPCM);
-    private DoubleSolenoid climber1, climber2, shelf1, shelf2, antenna;
+    private DoubleSolenoid climber1, climber2, shelf, antenna;
+    private boolean antennaOn, shelfOn, climberOn;
 
 
     public Shelf(){
-        climber1 = new DoubleSolenoid(PneumaticsModuleType.CTREPCM, 1, 2);
-        climber2 = new DoubleSolenoid(PneumaticsModuleType.CTREPCM, 3, 4);
-        shelf1 = new DoubleSolenoid(PneumaticsModuleType.CTREPCM, 5, 6);
-        shelf2 = new DoubleSolenoid(PneumaticsModuleType.CTREPCM, 7, 8);
-        antenna = new DoubleSolenoid(PneumaticsModuleType.CTREPCM, 9, 0);
+      
+        climber1 = new DoubleSolenoid(PneumaticsModuleType.CTREPCM, 3, 6);
+        climber2 = new DoubleSolenoid(PneumaticsModuleType.CTREPCM, 7, 2);
+        shelf    = new DoubleSolenoid(PneumaticsModuleType.CTREPCM, 1, 0);
+        antenna  = new DoubleSolenoid(PneumaticsModuleType.CTREPCM, 4, 5);
     }
 
     public Command openClimber() {
@@ -39,15 +41,13 @@ public class Shelf extends SubsystemBase {
 
       public Command openShelf() {
         return this.runOnce(() -> {
-          shelf1.set(Value.kReverse);
-          shelf2.set(Value.kReverse);
+          shelf.set(Value.kReverse);
         });
       }
 
       public Command closeShelf() {
         return this.runOnce(() -> {
-          shelf1.set(Value.kForward);
-          shelf2.set(Value.kForward);
+          shelf.set(Value.kForward);
         });
       }
 
@@ -61,6 +61,33 @@ public class Shelf extends SubsystemBase {
         return this.runOnce(() -> {
           antenna.set(Value.kForward);
         });
+      }
+
+      public Command toggleAntenna() {
+        
+        return this.runOnce(() -> { antennaOn = !antennaOn;
+        antenna.set(antennaOn ? Value.kForward : Value.kReverse);
+        });
+      }
+      public Command toggleShelf() {
+      
+        return this.runOnce(() -> { shelfOn = !shelfOn;
+        shelf.set(shelfOn ? Value.kForward : Value.kReverse);
+        });
+      }
+      public Command toggleClimbers() {
+        
+        return this.runOnce(() -> { climberOn = !climberOn;
+        climber1.set(climberOn ? Value.kForward : Value.kReverse);
+        climber2.set(climberOn ? Value.kForward : Value.kReverse);
+        });
+      }
+
+      public Command shelfAntennaDrop () {
+        return closeAntenna().andThen
+        (Commands.waitSeconds(0.5)).andThen(
+          openShelf()
+        );
       }
 
 

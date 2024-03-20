@@ -18,6 +18,7 @@ import frc.robot.commands.SwerveJoystickCmd;
 import frc.robot.subsystems.DoubleMotor;
 //import frc.robot.subsystems.Pneumatics;
 import frc.robot.subsystems.PoseEstimator;
+import frc.robot.subsystems.Shelf;
 import frc.robot.subsystems.Shooter;
 import frc.robot.subsystems.SwerveSubsystem;
 import frc.robot.subsystems.Vision;
@@ -25,15 +26,17 @@ import frc.robot.subsystems.Vision;
 public class RobotContainer {
    // private final Vision vision = new Vision();
     private final SwerveSubsystem swerveSubsystem = new SwerveSubsystem();
-    //private final Pneumatics pneumatics = new Pneumatics();
+    
     // private final PoseEstimator poseEstimator = new PoseEstimator(swerveSubsystem, vision,
     //         new Pose2d(2, 7, swerveSubsystem.getRotation2d()));
     // private AutoCommand autoComands = new AutoCommand(vision, swerveSubsystem);
     private final CommandXboxController driverJoystick = new CommandXboxController(OIConstants.kDriverControllerPort);
     private final CommandJoystick buttonBox = new CommandJoystick(1);
-    private DoubleMotor intakeUse = new DoubleMotor("intake", 0.6, 0.4, 9, 14);
+    //1 is the top, 2 is the bottom
+    private DoubleMotor intakeUse = new DoubleMotor("intake", 0.4, 0.6, 9, 14);
     private DoubleMotor conveyer = new DoubleMotor("conveyer", -0.6, 0.6, 12, 13);
     private Shooter shooterUse = new Shooter();
+    private Shelf shelfUse= new Shelf();
 
     private final SendableChooser<Command> autoChooser;
 
@@ -63,11 +66,19 @@ public class RobotContainer {
 
         // PathPlannerPath spin = PathPlannerPath.fromPathFile("Spin");
         driverJoystick.leftBumper().onTrue(swerveSubsystem.zeroHeadingCommand());
-        // driverJoytick.leftTrigger().onTrue(intakeUse.toggle(0.1));
-        driverJoystick.rightTrigger().onTrue(shooterUse.toggleSlow());
+        driverJoystick.rightBumper().onTrue(shooterUse.toggleSlow());
+        driverJoystick.rightTrigger().onTrue(shooterUse.toggleFast());
+        driverJoystick.rightStick().onTrue(shelfUse.toggleClimbers());
         driverJoystick.a().onTrue(intakeUse.toggle());
         driverJoystick.b().onTrue(conveyer.toggle());
-        // driverJoystick.y().onTrue(intakeUse.reverse());
+         driverJoystick.y().onTrue(intakeUse.toggleReverse());
+         driverJoystick.x().onTrue(shelfUse.toggleAntenna());
+         driverJoystick.leftTrigger().onTrue(shelfUse.toggleShelf());
+         buttonBox.button(10).onTrue(shelfUse.shelfAntennaDrop());
+         buttonBox.button(9).onTrue(shelfUse.openShelf());
+         buttonBox.button(7).onTrue(shelfUse.openClimber());
+         buttonBox.button(8).onTrue(shelfUse.closeClimber());
+
 
         //FIXME: need to get a stop from the throughbeam
         DigitalInput diThroughBeam = new DigitalInput(0);

@@ -64,7 +64,7 @@ public class Shooter extends SubsystemBase{
     public void runSlow() {
         isRunning = true;
         isFast = false;
-        makeSpeed(speed/2);
+        makeSpeed(speed/5);
     }
     /**
      * better for shooting upward and outward
