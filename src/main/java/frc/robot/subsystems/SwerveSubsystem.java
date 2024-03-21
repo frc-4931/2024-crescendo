@@ -122,7 +122,7 @@ public class SwerveSubsystem extends SubsystemBase {
     }
 
     public Rotation2d getRotation2d() {
-        return gyro.getRotation2d().times(-1);
+        return gyro.getRotation2d();
     }
 
     public Pose2d getPose() {
