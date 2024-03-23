@@ -99,7 +99,7 @@ public class SwerveSubsystem extends SubsystemBase {
             this::getSpeeds, 
             this::driveRobotRelative, 
             Constants.AutoConstants.pathFollowerConfig, 
-            () -> true, 
+            () -> false, 
             this);
     }
 

@@ -1,13 +1,16 @@
 package frc.robot;
 
 import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.auto.NamedCommands;
 
+import edu.wpi.first.cameraserver.CameraServer;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandJoystick;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
@@ -18,13 +21,14 @@ import frc.robot.commands.SwerveJoystickCmd;
 import frc.robot.subsystems.DoubleMotor;
 //import frc.robot.subsystems.Pneumatics;
 import frc.robot.subsystems.PoseEstimator;
+import frc.robot.subsystems.Sensors;
 import frc.robot.subsystems.Shelf;
 import frc.robot.subsystems.Shooter;
 import frc.robot.subsystems.SwerveSubsystem;
 import frc.robot.subsystems.Vision;
 
 public class RobotContainer {
-   // private final Vision vision = new Vision();
+   //private final Vision vision = new Vision();
     private final SwerveSubsystem swerveSubsystem = new SwerveSubsystem();
     
     // private final PoseEstimator poseEstimator = new PoseEstimator(swerveSubsystem, vision,
@@ -37,6 +41,7 @@ public class RobotContainer {
     private DoubleMotor conveyer = new DoubleMotor("conveyer", -0.6, 0.6, 12, 13);
     private Shooter shooterUse = new Shooter();
     private Shelf shelfUse= new Shelf();
+    private Sensors sensors = new Sensors();
 
     private final SendableChooser<Command> autoChooser;
 
@@ -50,15 +55,14 @@ public class RobotContainer {
                 () -> !driverJoystick.b().getAsBoolean()));
 
         // NamedCommands.registerCommand("PathPlan", autoComands.toNote());
+        NamedCommands.registerCommand("Shoot", shooterUse.toggleFast().andThen(Commands.waitSeconds(0.6)).andThen(conveyer.turnOn()));
+        NamedCommands.registerCommand("intake", intakeUse.turnOn().andThen(conveyer.turnOn()));
+        NamedCommands.registerCommand("off", shooterUse.stop().andThen(conveyer.turnOff()).andThen(intakeUse.turnOff()));
 
         configureButtonBindings();
 
         autoChooser = AutoBuilder.buildAutoChooser();
-
-        SmartDashboard.putData("StraightAuto", autoChooser);
-        SmartDashboard.putData("curvyAuto", autoChooser);
-        
-
+        SmartDashboard.putData("Auto", autoChooser);
     }
 
     private void configureButtonBindings() {
@@ -66,29 +70,57 @@ public class RobotContainer {
 
         // PathPlannerPath spin = PathPlannerPath.fromPathFile("Spin");
         driverJoystick.leftBumper().onTrue(swerveSubsystem.zeroHeadingCommand());
-        driverJoystick.rightBumper().onTrue(shooterUse.toggleSlow());
-        driverJoystick.rightTrigger().onTrue(shooterUse.toggleFast());
-        driverJoystick.rightStick().onTrue(shelfUse.toggleClimbers());
-        driverJoystick.a().onTrue(intakeUse.toggle());
-        driverJoystick.b().onTrue(conveyer.toggle());
-         driverJoystick.y().onTrue(intakeUse.toggleReverse());
-         driverJoystick.x().onTrue(shelfUse.toggleAntenna());
+        driverJoystick.rightBumper().onTrue(shelfUse.closeAntenna().andThen(shooterUse.stop()).andThen(conveyer.turnOff())); //all down
+        //driverJoystick.rightTrigger().onTrue(shooterUse.toggleFast());
+        // driverJoystick.rightStick().onTrue(shelfUse.toggleClimbers());
+        driverJoystick.a().onTrue( //intakeUse.turnOn().andThen(conveyer.turnOn()));
+        new FunctionalCommand(() -> { intakeUse.on(); conveyer.on(); }, () -> {},
+         (interrupted) -> { intakeUse.off(); conveyer.off(); },
+         sensors.getDio(), intakeUse, conveyer, sensors)
+        );
+        // .until(sensors.getDio()).finallyDo(() -> {
+
+        //     
+        // })); //intake
+        //driverJoystick.b().onTrue(conveyer.toggle()); 
+         driverJoystick.y().onTrue(shelfUse.toggleShelf()); //shelf up
+         driverJoystick.x().onTrue(//conveyer -> amp
+         shooterUse.runSlow().andThen(shelfUse.openAntenna()).andThen(shelfUse.closeShelf()).andThen(Commands.waitSeconds(0.6)).andThen(conveyer.turnOn())); //pin up
          driverJoystick.leftTrigger().onTrue(shelfUse.toggleShelf());
-         buttonBox.button(10).onTrue(shelfUse.shelfAntennaDrop());
-         buttonBox.button(9).onTrue(shelfUse.openShelf());
-         buttonBox.button(7).onTrue(shelfUse.openClimber());
-         buttonBox.button(8).onTrue(shelfUse.closeClimber());
+         driverJoystick.povDown().onTrue(intakeUse.turnOff());
+         driverJoystick.povUp().onTrue(shooterUse.stop().andThen(conveyer.turnOff()));
+         driverJoystick.povLeft().onTrue(shelfUse.openShelf());
+         driverJoystick.rightStick().onTrue(shelfUse.toggleClimbers());
+        //  driverJoystick.povRight().onTrue();
+
+
+
+        //Button Box
+         buttonBox.button(1).onTrue(intakeUse.toggleReverse());
+         buttonBox.button(2).onTrue(intakeUse.turnOff());
+         buttonBox.button(3).onTrue(conveyer.toggleReverse());
+         buttonBox.button(4).onTrue(conveyer.turnOff());
+         buttonBox.button(5).onTrue(shooterUse.runReverse());
+         buttonBox.button(6).onTrue(shooterUse.stop());
+
+         //lowered wait from .5 becuase we wait too long
+         buttonBox.button(7).onTrue(shooterUse.toggleFast().andThen(Commands.waitSeconds(.3)).andThen(conveyer.turnOn()));
+         //give me shooter
+
+         buttonBox.button(9).onTrue(shelfUse.openClimber());
+         buttonBox.button(10).onTrue(shelfUse.closeClimber());
+         
 
 
         //FIXME: need to get a stop from the throughbeam
-        DigitalInput diThroughBeam = new DigitalInput(0);
+        // DigitalInput diThroughBeam = new DigitalInput(0);
         // Command autoOff = new FunctionalCommand(() -> { intakeUse.turnOn(); conveyer.turnOn(); },
         //     () -> {},
         //     interrupted -> { intakeUse.turnOff(); conveyer.turnOff(); },
         //     () -> diThroughBeam.get(),
         //     intakeUse, conveyer
         // );
-        SmartDashboard.putBoolean("Through Beam", diThroughBeam.get());
+        // SmartDashboard.putBoolean("Through Beam", diThroughBeam.get());
 
 
         
@@ -100,7 +132,7 @@ public class RobotContainer {
     }
     // new JoystickButton(buttonBox, 4).onTrue(autoComands.PathToPose(1, 1, 0));
 
-    // //cool spin move
+    // // //cool spin move
     // new JoystickButton(buttonBox, 2).onTrue(Commands.runOnce(() -> {
     // //get current pose
     // Pose2d currentPose = swerveSubsystem.getPose();

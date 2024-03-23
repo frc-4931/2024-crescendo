@@ -26,26 +26,26 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class Vision {
     AprilTagFieldLayout aprilTagFieldLayout;
-    PhotonCamera camera = new PhotonCamera("photonvision");
+    // PhotonCamera camera = new PhotonCamera("photonvision");
 
     Transform3d robotToCam = new Transform3d(new Translation3d(-0.305, .3302, 0.305), new Rotation3d(0,0,45));
     PhotonPoseEstimator photonPoseEstimator; 
      private final ArrayList<double[]> poses = new ArrayList<>();
     public Vision(){
-    try {
-            aprilTagFieldLayout = AprilTagFieldLayout.loadFromResource(AprilTagFields.k2024Crescendo.m_resourceFile);
-            photonPoseEstimator = new PhotonPoseEstimator(aprilTagFieldLayout, PoseStrategy.CLOSEST_TO_REFERENCE_POSE, camera, robotToCam);
-        } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
+    // try {
+    //         aprilTagFieldLayout = AprilTagFieldLayout.loadFromResource(AprilTagFields.k2024Crescendo.m_resourceFile);
+    //         photonPoseEstimator = new PhotonPoseEstimator(aprilTagFieldLayout, PoseStrategy.CLOSEST_TO_REFERENCE_POSE, camera, robotToCam);
+    //     } catch (IOException e) {
+    //         // TODO Auto-generated catch block
+    //         e.printStackTrace();
+    //     }
     }
 
-    public boolean valid() {
-        var result = camera.getLatestResult();
-        boolean foundTarget = result.hasTargets();
-        return foundTarget;
-    }
+    // public boolean valid() {
+    //     var result = camera.getLatestResult();
+    //     boolean foundTarget = result.hasTargets();
+    //     return foundTarget;
+    // }
 
 
     //  public void updatePose() {
@@ -58,14 +58,14 @@ public class Vision {
     //     }
     // }
 
-     public Optional<EstimatedRobotPose> getEstimatedGlobalPose(Pose2d prevEstimatedRobotPose) {
-        photonPoseEstimator.setReferencePose(prevEstimatedRobotPose);
-        return photonPoseEstimator.update();
-    }
+    //  public Optional<EstimatedRobotPose> getEstimatedGlobalPose(Pose2d prevEstimatedRobotPose) {
+    //     photonPoseEstimator.setReferencePose(prevEstimatedRobotPose);
+    //     return photonPoseEstimator.update();
+    // }
 
-    public double[] getLatestPose3d() {
-        return poses.size() == 0 ? new double[7] : poses.remove(0);
-    }
+    // public double[] getLatestPose3d() {
+    //     return poses.size() == 0 ? new double[7] : poses.remove(0);
+    // }
 
     public double getNoteDistance(){
         NetworkTable table = NetworkTableInstance.getDefault().getTable("limelight");

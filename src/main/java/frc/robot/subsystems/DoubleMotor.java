@@ -16,7 +16,6 @@ public class DoubleMotor extends SubsystemBase {
     private String subsystem;
     private final CANSparkMax motor1;
     private final CANSparkMax motor2;
-    
     /**
      * Constructer
      * starts off
@@ -28,8 +27,13 @@ public class DoubleMotor extends SubsystemBase {
         isOn = false;
         motor1 = new CANSparkMax(motorId1 , MotorType.kBrushless);
         motor2 = new CANSparkMax(motorId2, MotorType.kBrushless);
+
+        motor1.setSmartCurrentLimit(25);
+        motor2.setSmartCurrentLimit(25);
+
         motor1.setInverted(false);
         motor2.setInverted(false);
+        SmartDashboard.putBoolean(subsystem, isOn);
         SmartDashboard.putNumber(subsystem + "TargetSpeed1", speed1);
         SmartDashboard.putNumber(subsystem + "TargetSpeed2", speed2);
     }
@@ -47,28 +51,26 @@ public class DoubleMotor extends SubsystemBase {
         });
     }
 
-    public Command on() {
-        return this.run(this::turnOn);
-    }
-
-    public Command off() {
-        return this.run(this::turnOff);
-    }
-
-    public void turnOn() {
+    public void on() {
         isOn = true;
         setSpeed(speed1, speed2);
     }
-    
-    public void turnOff() {
+
+    public void off() {
         isOn = false;
         setSpeed(0,0);
     }
 
+    public Command turnOn() {
+        return this.runOnce(this::on);
+    }
+    
+    public Command turnOff() {
+        return this.runOnce(this::off);
+    }
     public void reverse() {
         setSpeed(-speed1, -speed2);
     }
-
     /**
      * Speed Should NEVER exceed the domain (-1,1)
      * @param speed1,speed2
@@ -78,6 +80,7 @@ public class DoubleMotor extends SubsystemBase {
         motor2.set(MathUtil.clamp(speed2, -1, 1));
         SmartDashboard.putBoolean(subsystem, isOn);
     }
+    
 
     @Override
     public void periodic() {

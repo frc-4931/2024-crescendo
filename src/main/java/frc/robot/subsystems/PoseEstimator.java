@@ -53,25 +53,25 @@ public class PoseEstimator extends SubsystemBase {
     }
 
     private void updatePoseEstimator() {
-        Optional<EstimatedRobotPose> visionMeasurement = vision.getEstimatedGlobalPose(swerve.getPose());
-        double velocity = Math.sqrt(swerve.getChassisSpeed().vxMetersPerSecond*swerve.getChassisSpeed().vxMetersPerSecond + swerve.getChassisSpeed().vyMetersPerSecond*swerve.getChassisSpeed().vyMetersPerSecond);
-        double angularVelocity = swerve.getChassisSpeed().omegaRadiansPerSecond;
-        Pose2d currentPose = getPose();
+        // Optional<EstimatedRobotPose> visionMeasurement = vision.getEstimatedGlobalPose(swerve.getPose());
+        // double velocity = Math.sqrt(swerve.getChassisSpeed().vxMetersPerSecond*swerve.getChassisSpeed().vxMetersPerSecond + swerve.getChassisSpeed().vyMetersPerSecond*swerve.getChassisSpeed().vyMetersPerSecond);
+        // double angularVelocity = swerve.getChassisSpeed().omegaRadiansPerSecond;
+        // Pose2d currentPose = getPose();
 
-            m_poseEstimator.updateWithTime(Timer.getFPGATimestamp(), swerve.getRotation2d(), swerve.getPosition());
-            //if (((currentPose.getTranslation().getDistance(visionPose.getTranslation()) <= VisionConstants.kPoseErrorAcceptance || !m_initializedPose) && visionMeasurement != new double[7] && visionPose.getTranslation().getDistance(currentPose.getTranslation()) >= 0.05 && velocity <= 3.0 && angularVelocity <= 0.5 * Math.PI && visionPose.getTranslation().getX() <= 5.0)) {
-               // SmartDashboard.putBoolean("Set Pose Est", false);
-                if (m_initializedPose) {
-                    if(visionMeasurement.isPresent()){
-                        var measure = visionMeasurement.get();
+        //     m_poseEstimator.updateWithTime(Timer.getFPGATimestamp(), swerve.getRotation2d(), swerve.getPosition());
+        //     //if (((currentPose.getTranslation().getDistance(visionPose.getTranslation()) <= VisionConstants.kPoseErrorAcceptance || !m_initializedPose) && visionMeasurement != new double[7] && visionPose.getTranslation().getDistance(currentPose.getTranslation()) >= 0.05 && velocity <= 3.0 && angularVelocity <= 0.5 * Math.PI && visionPose.getTranslation().getX() <= 5.0)) {
+        //        // SmartDashboard.putBoolean("Set Pose Est", false);
+        //         if (m_initializedPose) {
+        //             if(visionMeasurement.isPresent()){
+        //                 var measure = visionMeasurement.get();
 
 
-                        m_poseEstimator.addVisionMeasurement(measure.estimatedPose.toPose2d(), measure.timestampSeconds, VecBuilder.fill(5.0, 5.0, 5.0));
-                    }
-                } else {
-                   // m_poseEstimator.addVisionMeasurement(visionPose, timestamp, VecBuilder.fill(0.0, 0.0, 999999));
-                    //m_initializedPose = true;
-                }
+        //                 m_poseEstimator.addVisionMeasurement(measure.estimatedPose.toPose2d(), measure.timestampSeconds, VecBuilder.fill(5.0, 5.0, 5.0));
+        //             }
+        //         } else {
+        //            // m_poseEstimator.addVisionMeasurement(visionPose, timestamp, VecBuilder.fill(0.0, 0.0, 999999));
+        //             //m_initializedPose = true;
+        //         }
             }
         //}
     

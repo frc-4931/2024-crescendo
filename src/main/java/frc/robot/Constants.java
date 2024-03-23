@@ -68,7 +68,7 @@ public final class Constants {
         public static final double kFrontRightDriveAbsoluteEncoderOffsetRad = 1.711;
         public static final double kBackRightDriveAbsoluteEncoderOffsetRad = 2.823;
 
-        public static final double speedMultiplier = .3;
+        public static final double speedMultiplier = .9;
         public static final double turnSpeedMultiplier = .6;
 
         public static final double kPhysicalMaxSpeedMetersPerSecond = 3.81;
