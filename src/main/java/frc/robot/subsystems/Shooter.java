@@ -102,7 +102,7 @@ public class Shooter extends SubsystemBase{
     public void runFast() {
         isRunning = true;
         isFast = true;
-        makeSpeed(-0.925);
+        makeSpeed(-0.47);
     }
     /**
      * sets the speed of both motors, only accesable in this class

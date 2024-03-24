@@ -1,6 +1,12 @@
 {
   "version": 1.0,
-  "startingPose": null,
+  "startingPose": {
+    "position": {
+      "x": 1.4,
+      "y": 5.56
+    },
+    "rotation": 0
+  },
   "command": {
     "type": "sequential",
     "data": {
@@ -8,7 +14,7 @@
         {
           "type": "named",
           "data": {
-            "name": "Shoot"
+            "name": "shoot"
           }
         },
         {
@@ -44,19 +50,13 @@
         {
           "type": "wait",
           "data": {
-            "waitTime": 3.0
+            "waitTime": 5.0
           }
         },
         {
           "type": "named",
           "data": {
             "name": "off"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "note Speaker BC"
           }
         }
       ]

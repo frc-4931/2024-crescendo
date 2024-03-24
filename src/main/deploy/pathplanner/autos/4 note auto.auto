@@ -70,6 +70,48 @@
           "data": {
             "name": "off"
           }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "S-N 2"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "intake"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "IN 2"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "N-S 3"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "shoot"
+          }
+        },
+        {
+          "type": "wait",
+          "data": {
+            "waitTime": 5.0
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "off"
+          }
         }
       ]
     }

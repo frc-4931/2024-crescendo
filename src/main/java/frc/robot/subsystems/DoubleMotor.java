@@ -2,6 +2,7 @@ package frc.robot.subsystems;
 
 import com.revrobotics.CANSparkLowLevel.MotorType;
 import com.revrobotics.CANSparkMax;
+import com.revrobotics.CANSparkBase.IdleMode;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -33,6 +34,9 @@ public class DoubleMotor extends SubsystemBase {
 
         motor1.setInverted(false);
         motor2.setInverted(false);
+        motor1.setIdleMode(IdleMode.kCoast);
+        motor2.setIdleMode(IdleMode.kCoast);
+
         SmartDashboard.putBoolean(subsystem, isOn);
         SmartDashboard.putNumber(subsystem + "TargetSpeed1", speed1);
         SmartDashboard.putNumber(subsystem + "TargetSpeed2", speed2);

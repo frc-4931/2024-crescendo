@@ -6,8 +6,9 @@ import com.revrobotics.CANSparkLowLevel;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel;
 import com.revrobotics.RelativeEncoder;
+import com.revrobotics.CANSparkBase.IdleMode;
+import com.revrobotics.CANSparkLowLevel.MotorType;
 import com.revrobotics.CANSparkMax;
-import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
 import edu.wpi.first.wpilibj.AnalogEncoder;
 import edu.wpi.first.wpilibj.AnalogInput;
@@ -42,8 +43,6 @@ public class SwerveModule {
     private final SlewRateLimiter filter;
 
 
-    private static final CANSparkLowLevel.MotorType kMotorType = CANSparkLowLevel.MotorType.kBrushless;
-
     public SwerveModule(int driveMotorId, int turningMotorId, boolean driveMotorReversed, boolean turningMotorReversed,
             int absoluteEncoderId, double absoluteEncoderOffset, boolean absoluteEncoderReversed) {
 
@@ -51,9 +50,11 @@ public class SwerveModule {
         this.absoluteEncoderReversed = absoluteEncoderReversed;
         absoluteEncoder = new AnalogInput(absoluteEncoderId);
 
-        driveMotor = new CANSparkMax(driveMotorId, kMotorType);
-        turningMotor = new CANSparkMax(turningMotorId, kMotorType);
-
+        driveMotor = new CANSparkMax(driveMotorId, MotorType.kBrushless);
+        driveMotor.setIdleMode(IdleMode.kBrake);
+        turningMotor = new CANSparkMax(turningMotorId, MotorType.kBrushless);
+        turningMotor.setIdleMode(IdleMode.kBrake);
+        
         driveMotor.setInverted(driveMotorReversed);
         turningMotor.setInverted(turningMotorReversed);
 
