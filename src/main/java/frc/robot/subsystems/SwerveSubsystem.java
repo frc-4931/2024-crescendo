@@ -4,6 +4,7 @@ import com.ctre.phoenix.sensors.WPI_PigeonIMU;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.util.PathPlannerLogging;
 
+import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
@@ -99,7 +100,7 @@ public class SwerveSubsystem extends SubsystemBase {
             this::getSpeeds, 
             this::driveRobotRelative, 
             Constants.AutoConstants.pathFollowerConfig, 
-            () -> false, 
+            () -> true, 
             this);
     }
 

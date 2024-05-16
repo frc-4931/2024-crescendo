@@ -34,11 +34,12 @@ public class RobotContainer {
     // private final PoseEstimator poseEstimator = new PoseEstimator(swerveSubsystem, vision,
     //         new Pose2d(2, 7, swerveSubsystem.getRotation2d()));
     // private AutoCommand autoComands = new AutoCommand(vision, swerveSubsystem);
+    //can we add this in, photon/ pi camera wasn't working at comp
     private final CommandXboxController driverJoystick = new CommandXboxController(OIConstants.kDriverControllerPort);
     private final CommandJoystick buttonBox = new CommandJoystick(1);
     //1 is the top, 2 is the bottom
-    private DoubleMotor intakeUse = new DoubleMotor("intake", 0.4, 0.6, 9, 14);
-    private DoubleMotor conveyer = new DoubleMotor("conveyer", -0.6, 0.6, 12, 13);
+    private DoubleMotor intakeUse = new DoubleMotor("intake", 0.6, 0.9, 9, 14);
+    private DoubleMotor conveyer = new DoubleMotor("conveyer", -0.9, 0.6, 12, 13);
     private Shooter shooterUse = new Shooter();
     private Shelf shelfUse= new Shelf();
     private Sensors sensors = new Sensors();
@@ -47,6 +48,8 @@ public class RobotContainer {
 
     public RobotContainer() {
         // CameraServer.startAutomaticCapture();
+        // do we want to add usb camera for view, limelightin switch will likley o down
+        // any otehr ideas for cameras
         swerveSubsystem.setDefaultCommand(new SwerveJoystickCmd(
                 swerveSubsystem,
                 () -> -driverJoystick.getRawAxis(OIConstants.kDriverYAxis),
@@ -54,15 +57,14 @@ public class RobotContainer {
                 () -> -driverJoystick.getRawAxis(OIConstants.kDriverRotAxis),
                 () -> !driverJoystick.b().getAsBoolean()));
 
-        // NamedCommands.registerCommand("PathPlan", autoComands.toNote());
-        NamedCommands.registerCommand("Shoot", shooterUse.toggleFast().andThen(Commands.waitSeconds(0.6)).andThen(conveyer.turnOn()));
+        NamedCommands.registerCommand("Shoot", shooterUse.toggleFast().andThen(Commands.waitSeconds(0.45)).andThen(conveyer.turnOn()));
         NamedCommands.registerCommand("intake", intakeUse.turnOn().andThen(conveyer.turnOn()));
         NamedCommands.registerCommand("off", shooterUse.stop().andThen(conveyer.turnOff()).andThen(intakeUse.turnOff()));
 
         configureButtonBindings();
 
         autoChooser = AutoBuilder.buildAutoChooser();
-        SmartDashboard.putData("Auto", autoChooser);
+        SmartDashboard.putData("Choose", autoChooser);
     }
 
     private void configureButtonBindings() {
@@ -70,7 +72,9 @@ public class RobotContainer {
 
         // PathPlannerPath spin = PathPlannerPath.fromPathFile("Spin");
         driverJoystick.leftBumper().onTrue(swerveSubsystem.zeroHeadingCommand());
-        driverJoystick.rightBumper().onTrue(shelfUse.closeAntenna().andThen(shooterUse.stop()).andThen(conveyer.turnOff())); //all down
+        driverJoystick.rightBumper().onTrue(shelfUse.openClimber());
+        driverJoystick.rightTrigger().onTrue(shelfUse.closeClimber());
+        //driverJoystick.rightBumper().onTrue(shelfUse.closeAntenna().andThen(shooterUse.stop()).andThen(conveyer.turnOff())); //all down
         //driverJoystick.rightTrigger().onTrue(shooterUse.toggleFast());
         // driverJoystick.rightStick().onTrue(shelfUse.toggleClimbers());
         driverJoystick.a().onTrue( //intakeUse.turnOn().andThen(conveyer.turnOn()));
@@ -83,17 +87,31 @@ public class RobotContainer {
         //     
         // })); //intake
         //driverJoystick.b().onTrue(conveyer.toggle()); 
-         driverJoystick.y().onTrue(shelfUse.toggleShelf()); //shelf up
-         driverJoystick.x().onTrue(//conveyer -> amp
-         shooterUse.runSlow().andThen(shelfUse.openAntenna()).andThen(shelfUse.closeShelf()).andThen(Commands.waitSeconds(0.6)).andThen(conveyer.turnOn())); //pin up
-         driverJoystick.leftTrigger().onTrue(shelfUse.toggleShelf());
+         driverJoystick.y().onTrue(shooterUse.toggleFast().andThen(conveyer.turnOn())); //el shooto bigo
+         driverJoystick.x().onTrue(intakeUse.turnOff().andThen(shooterUse.stop()).andThen(conveyer.turnOff()));
+         //driverJoystick.x().onTrue(//conveyer -> amp no pnuematics
+         //shooterUse.runSlow().andThen(Commands.waitSeconds(0.3)).andThen(conveyer.turnOn())); //pin up
+         //driverJoystick.leftTrigger().onTrue(shelfUse.toggleShelf());
          driverJoystick.povDown().onTrue(intakeUse.turnOff());
          driverJoystick.povUp().onTrue(shooterUse.stop().andThen(conveyer.turnOff()));
-         driverJoystick.povLeft().onTrue(shelfUse.openShelf());
-         driverJoystick.rightStick().onTrue(shelfUse.toggleClimbers());
+         driverJoystick.povLeft().onTrue(conveyer.turnOff());
+
+         //driverJoystick.rightStick().onTrue(shelfUse.toggleClimbers());
         //  driverJoystick.povRight().onTrue();
 
+        /*FIXME: Buttons
+        Buttons to use
+        joystick x
+        joystick rigt bumper
+        joystick right trigger
+        joystickleft triger
 
+        make sheet of what buttons do?
+
+        what function do we need, good for te newer programmers
+
+
+        */
 
         //Button Box
          buttonBox.button(1).onTrue(intakeUse.toggleReverse());
@@ -127,8 +145,6 @@ public class RobotContainer {
         
         // driverJoytick.rightBumper().onTrue(AutoBuilder.followPath(spin));
         // buttonBox.button(1).onTrue(intakeUse.toggle(0.7));
-        buttonBox.button(2).onTrue(shooterUse.toggleFast());
-        buttonBox.button(3).onTrue(shooterUse.toggleSlow());
     }
     // new JoystickButton(buttonBox, 4).onTrue(autoComands.PathToPose(1, 1, 0));
 

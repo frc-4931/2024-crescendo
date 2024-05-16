@@ -19,6 +19,7 @@ public final class Constants {
         public static final double kDriveEncoderRPM2MeterPerSec = kDriveEncoderRot2Meter / 60;
         public static final double kTurningEncoderRPM2RadPerSec = kTurningEncoderRot2Rad / 60;
         public static final double kPTurning = 0.6;
+        //FIXME: do we want to look at PID tuning
     }
 
     public static final class DriveConstants {
@@ -64,7 +65,7 @@ public final class Constants {
         public static final boolean kBackRightDriveAbsoluteEncoderReversed = false;
 
         public static final double kFrontLeftDriveAbsoluteEncoderOffsetRad = 4.298;
-        public static final double kBackLeftDriveAbsoluteEncoderOffsetRad = 4.727;
+        public static final double kBackLeftDriveAbsoluteEncoderOffsetRad = 4.78;
         public static final double kFrontRightDriveAbsoluteEncoderOffsetRad = 1.711;
         public static final double kBackRightDriveAbsoluteEncoderOffsetRad = 2.823;
 
@@ -97,7 +98,7 @@ public final class Constants {
         public static final int kDriverRotAxis = 4;
         public static final int kDriverFieldOrientedButtonIdx = 1;
 
-        public static final double kDeadband = 0.05;
+        public static final double kDeadband = 0.07;
     }
     public static final class VisionConstants {
         public static final double kPoseErrorAcceptance = 2.0; // How much error there can be between current stimated pose and vision pose in meters

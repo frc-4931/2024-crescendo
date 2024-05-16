@@ -75,7 +75,8 @@ public class SwerveModule {
         drivingPIDController = new PIDController(1, 0.0, 0.0);
         drivingPIDController.enableContinuousInput(-1, 1);
 
-        filter = new SlewRateLimiter(2);
+        filter = new SlewRateLimiter(1.45);
+        //FIXME: do we wnat to adjuct this becuase our weight is diffrent, things are not looking as smoooth
 
         resetEncoders();
     }
