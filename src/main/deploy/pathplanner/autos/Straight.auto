@@ -1,0 +1,25 @@
+{
+  "version": 1.0,
+  "startingPose": {
+    "position": {
+      "x": 1.0798029014032335,
+      "y": 2.634938222800839
+    },
+    "rotation": 0
+  },
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Straight2"
+          }
+        }
+      ]
+    }
+  },
+  "folder": "Kentuck",
+  "choreoAuto": false
+}

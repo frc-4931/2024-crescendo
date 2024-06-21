@@ -5,12 +5,16 @@
   "pathFolders": [
     "4 note auto",
     "Blue",
+    "KentuckyAutos",
     "New Folder",
     "New New Folder",
+    "kentuck",
     "Red"
   ],
   "autoFolders": [
     "Blue",
+    "KentuckyMain",
+    "Kentuck",
     "Red"
   ],
   "defaultMaxVel": 3.81,
